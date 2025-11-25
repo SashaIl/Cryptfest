@@ -9,4 +9,5 @@ public interface IApiService
     ApiAccessDto GetApiKeyToken();
     string GetTop30AssetUrl();
     string GetLatestDataUrl();
+    string GetSpecifiedAsset();
 }

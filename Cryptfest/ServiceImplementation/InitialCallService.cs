@@ -3,6 +3,7 @@ using API.Data.Entities.Wallet;
 using API.Data.Entities.WalletEntities;
 using Cryptfest.Interfaces.Repositories;
 using Cryptfest.Interfaces.Services;
+using Cryptfest.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Text.Json;
@@ -14,14 +15,12 @@ public class InitialCallService : IInitialCallService
 
     private readonly ApplicationContext _context;
     private readonly IHttpClientFactory _httpClient;
-    private readonly ICryptoAssetRepository _cryptoAssetRepository;
     private readonly IApiService _api;
 
     public InitialCallService(ApplicationContext context, IHttpClientFactory httpClient, ICryptoAssetRepository cryptoAssetRepository, IApiService api)
     {
         _context = context;
         _httpClient = httpClient;
-        _cryptoAssetRepository = cryptoAssetRepository;
         _api = api;
     }
 
@@ -29,10 +28,15 @@ public class InitialCallService : IInitialCallService
     {
         //var keyAndToken = _context.ApiAccess.ToList().First();
 
-        string url = $"https://pro-api.coinmarketcap.com/v2/cryptocurrency/info?symbol={symbol}";
+        var keyAndToken = _api.GetApiKeyToken();
+
+        string top30 = _api.GetTop30AssetUrl();
+        string latestDataUrl = _api.GetLatestDataUrl();
+
+
+        string url = _api.GetSpecifiedAsset() + symbol;
         HttpClient client = _httpClient.CreateClient(url);
-        //client.DefaultRequestHeaders.Add($"{_api.Key}", $"{_api.Token}");
-        client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", "fb2a0246-a49a-4299-929a-75de33fb37ec");
+        client.DefaultRequestHeaders.Add(keyAndToken.Key, keyAndToken.Token);
 
         try
         {
@@ -63,7 +67,7 @@ public class InitialCallService : IInitialCallService
         try
         {
 
-            
+
             string json = await client.GetStringAsync(top30);
 
             JsonDocument doc = JsonDocument.Parse(json);
@@ -71,7 +75,7 @@ public class InitialCallService : IInitialCallService
 
             // json where all info about assets
             JsonElement items = root.GetProperty("data");
-            
+
             string symbol = "";
             string name = "";
             string logo = "";
@@ -109,7 +113,7 @@ public class InitialCallService : IInitialCallService
                 {
                     logos[symbolName.Symbol] = logo;
                 }
-                
+
             });
 
             foreach (var item in assets)
@@ -121,7 +125,7 @@ public class InitialCallService : IInitialCallService
             }
 
             // Because will be error 429(too many requests)
-            await Task.Delay(60_000);
+            // await Task.Delay(60_000);
 
 
             // here taking info about price
@@ -138,21 +142,10 @@ public class InitialCallService : IInitialCallService
                 {
                     var usd = item.GetProperty("quote").GetProperty("USD");
                     usd.GetProperty("price").TryGetDecimal(out var price);
-                    //usd.GetProperty("percent_change_1h").TryGetDecimal(out var percent1h);
-                    //usd.GetProperty("percent_change_24h").TryGetDecimal(out var percent24h);
-                    //usd.GetProperty("percent_change_7d").TryGetDecimal(out var percent7d);
-                    //usd.GetProperty("percent_change_30d").TryGetDecimal(out var percent30d);
-                    //usd.GetProperty("percent_change_60d").TryGetDecimal(out var percent60d);
-
 
                     asset.MarketData = new CryptoAssetMarketData
                     {
                         CurrPrice = price,
-                        //PercentChange1h = percent1h,
-                        //PercentChange24h = percent24h,
-                        //PercentChange7d = percent7d,
-                        //PercentChange30d = percent7d,
-                        //PercentChange60d = percent7d
                     };
                 }
             }

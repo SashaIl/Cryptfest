@@ -61,9 +61,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://127.0.0.1:5500")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            //policy.WithOrigins("http://127.0.0.1:5500")
+            //      .AllowAnyHeader()
+            //      .AllowAnyMethod();
+            policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
         });
 });
 
@@ -93,8 +96,8 @@ using (var scope = app.Services.CreateScope())
 {
     // Create db
     var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    await context.Database.EnsureDeletedAsync();
-    await context.Database.EnsureCreatedAsync();
+    //await context.Database.EnsureDeletedAsync();
+    //await context.Database.EnsureCreatedAsync();
 
     // Take crypto assets from api and save in db
     if ( !(context.CryptoAsset.Any()) )

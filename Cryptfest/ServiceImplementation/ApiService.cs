@@ -61,6 +61,17 @@ public class ApiService : IApiService
     }
 
 
+    public string GetSpecifiedAsset()
+    {
+        try
+        {
+            string output = _conf["ApiLinks:SpecifiedAsset"]!;
+            return output;
+        }
+        catch { throw; }
+    }
+
+
     public async Task<ToClientDto> UpdateMarketDataInDbAsync(Guid walletId)
     {
         List<CryptoAsset> cryptoAssets = await _cryptoAssetRepository.GetCryptoAssetsAsync();
