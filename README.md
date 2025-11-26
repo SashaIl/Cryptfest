@@ -1,7 +1,7 @@
 Description
 -
 This backend was built to handle cryptocurrency features on the client side. It's written in ASP.NET, and the project is organized into clear folders so everything is easy to find.
-DTOs are separated, and the project also includes JWT authentication and SMTP email sending.
+DTOs are separated, and the project also includes JWT authentication and SMTP email sending. The backend integrates with an external API to handle certain operations.
 
 ---------
 Project Structure:
