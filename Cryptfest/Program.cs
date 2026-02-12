@@ -30,7 +30,16 @@ builder.Services.AddScoped<ICryptoAssetRepository, CryptoAssetRepository>();
 builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Secret"]!);
+try
+{
+
+    var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Secret"]!);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error reading JWT secret key: {ex})");
+}
+
 
 builder.Services.AddAuthentication(options =>
 {
