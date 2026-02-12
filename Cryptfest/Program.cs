@@ -100,6 +100,7 @@ using (var scope = app.Services.CreateScope())
     //await context.Database.EnsureCreatedAsync();
 
     // Take crypto assets from api and save in db
+
     if ( !(context.CryptoAsset.Any()) )
     {
         var initialCall = scope.ServiceProvider.GetRequiredService<IInitialCallService>();
